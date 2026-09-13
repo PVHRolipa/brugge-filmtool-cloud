@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: brugge-film-tool
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python browser.py
+    healthCheckPath: /api/health
+    envVars:
+      - key: BRUGGE_FILM_AUTO_REFRESH_HOURS
+        value: "6"
+      - key: BRUGGE_FILM_REFRESH_COOLDOWN_SECONDS
+        value: "600"
