@@ -48,7 +48,7 @@ cd "$PROJECT"
   cleanup
   trap - EXIT
 
-  git add -A
+  git add data/ web/ *.html *.json *.csv 2>/dev/null || true
 
   if git diff --cached --quiet; then
     echo "Geen wijzigingen om te publiceren."
