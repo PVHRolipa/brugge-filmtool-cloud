@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-import re
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -11,9 +10,13 @@ PROJECT = Path(__file__).resolve().parent
 WEB = PROJECT / "web"
 DOCS = PROJECT / "docs"
 DATA = DOCS / "data"
-EVENTS_JSON = DATA / "events.json"
 
 STATIC_SHIM = r"""
+<style id="github-pages-public-fixes">
+  /* De publieke GitHub Pages-site kan zelf niet scrapen. */
+  .public-refresh-hidden { display: none !important; }
+</style>
+
 <script id="github-pages-static-adapter">
 (() => {
   const originalFetch = window.fetch.bind(window);
@@ -23,6 +26,38 @@ STATIC_SHIM = r"""
       status,
       headers: {"Content-Type": "application/json; charset=utf-8"}
     }));
+  }
+
+  function isRefreshControl(el) {
+    if (!el) return false;
+    const candidate = el.closest ? el.closest("button, a, [role='button']") : null;
+    if (!candidate) return false;
+
+    const text = (candidate.textContent || "").trim().toLowerCase();
+    const title = (candidate.getAttribute("title") || "").toLowerCase();
+    const aria = (candidate.getAttribute("aria-label") || "").toLowerCase();
+    const idClass = ((candidate.id || "") + " " + (candidate.className || "")).toLowerCase();
+
+    return (
+      text.includes("ververs") ||
+      text === "refresh" ||
+      title.includes("ververs") ||
+      aria.includes("ververs") ||
+      idClass.includes("refresh")
+    );
+  }
+
+  function hideRefreshControls(root = document) {
+    const candidates = root.querySelectorAll
+      ? root.querySelectorAll("button, a, [role='button']")
+      : [];
+    for (const el of candidates) {
+      if (isRefreshControl(el)) {
+        el.classList.add("public-refresh-hidden");
+        el.setAttribute("aria-hidden", "true");
+        el.setAttribute("tabindex", "-1");
+      }
+    }
   }
 
   window.fetch = function(input, init) {
@@ -39,40 +74,45 @@ STATIC_SHIM = r"""
     }
 
     if (path.endsWith("/api/health")) {
-      return jsonResponse({
-        ok: true,
-        mode: "github-pages",
-        static: true
-      });
+      return jsonResponse({ok: true, mode: "github-pages", static: true});
     }
 
     if (path.endsWith("/api/refresh")) {
+      /* Nooit een publieke scrape proberen. Behandel dit als een geslaagde no-op. */
       return jsonResponse({
-        ok: false,
+        ok: true,
         static: true,
-        message: "De publieke Filmtool wordt dagelijks automatisch om 12:00 bijgewerkt."
-      }, 409);
+        skipped: true,
+        message: "De publieke agenda wordt dagelijks automatisch bijgewerkt."
+      }, 200);
     }
 
     return originalFetch(input, init);
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
-    for (const button of document.querySelectorAll("button")) {
-      const text = (button.textContent || "").trim().toLowerCase();
-      if (text === "verversen" || text === "refresh" || text.includes("ververs data")) {
-        button.disabled = true;
-        button.title = "De publieke Filmtool wordt dagelijks automatisch om 12:00 bijgewerkt.";
-      }
+  /* Blokkeer een refresh-click ook als de knop later door JavaScript wordt opgebouwd. */
+  document.addEventListener("click", (event) => {
+    if (isRefreshControl(event.target)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return false;
     }
+  }, true);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    hideRefreshControls();
+
+    const observer = new MutationObserver(() => hideRefreshControls());
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
   });
 })();
 </script>
 """
 
 def inject_adapter(html: str) -> str:
-    # GitHub Pages for a project lives below /brugge-filmtool-cloud/.
-    # Convert the few root-relative local-server asset paths to project-relative paths.
     replacements = {
         'href="/manifest.webmanifest"': 'href="./manifest.webmanifest"',
         "href='/manifest.webmanifest'": "href='./manifest.webmanifest'",
@@ -92,13 +132,18 @@ def inject_adapter(html: str) -> str:
     for old, new in replacements.items():
         html = html.replace(old, new)
 
-    if "github-pages-static-adapter" not in html:
-        if "<head>" in html:
-            html = html.replace("<head>", "<head>\n" + STATIC_SHIM, 1)
-        elif "</head>" in html:
-            html = html.replace("</head>", STATIC_SHIM + "\n</head>", 1)
-        else:
-            html = STATIC_SHIM + "\n" + html
+    # Vervang een oudere adapter wanneer die al in docs/index.html zou zitten.
+    marker = '<script id="github-pages-static-adapter">'
+    if marker in html:
+        # We bouwen sowieso vanaf web/index.html, dus dit is vooral extra veiligheid.
+        pass
+
+    if "<head>" in html:
+        html = html.replace("<head>", "<head>\n" + STATIC_SHIM, 1)
+    elif "</head>" in html:
+        html = html.replace("</head>", STATIC_SHIM + "\n</head>", 1)
+    else:
+        html = STATIC_SHIM + "\n" + html
     return html
 
 def copy_if_exists(src: Path, dst: Path) -> None:
@@ -114,7 +159,6 @@ def main() -> None:
     DOCS.mkdir(exist_ok=True)
     DATA.mkdir(parents=True, exist_ok=True)
 
-    # Keep all existing skins/assets intact.
     docs_web = DOCS / "web"
     if docs_web.exists():
         shutil.rmtree(docs_web)
@@ -123,7 +167,6 @@ def main() -> None:
     html = source_index.read_text(encoding="utf-8")
     (DOCS / "index.html").write_text(inject_adapter(html), encoding="utf-8")
 
-    # Copy root PWA assets used by the local server, when present.
     for name in ("manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png"):
         copy_if_exists(PROJECT / name, DOCS / name)
 

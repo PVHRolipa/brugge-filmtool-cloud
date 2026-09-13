@@ -2,6 +2,11 @@
 <html lang="nl">
 <head>
 
+<style id="github-pages-public-fixes">
+  /* De publieke GitHub Pages-site kan zelf niet scrapen. */
+  .public-refresh-hidden { display: none !important; }
+</style>
+
 <script id="github-pages-static-adapter">
 (() => {
   const originalFetch = window.fetch.bind(window);
@@ -11,6 +16,38 @@
       status,
       headers: {"Content-Type": "application/json; charset=utf-8"}
     }));
+  }
+
+  function isRefreshControl(el) {
+    if (!el) return false;
+    const candidate = el.closest ? el.closest("button, a, [role='button']") : null;
+    if (!candidate) return false;
+
+    const text = (candidate.textContent || "").trim().toLowerCase();
+    const title = (candidate.getAttribute("title") || "").toLowerCase();
+    const aria = (candidate.getAttribute("aria-label") || "").toLowerCase();
+    const idClass = ((candidate.id || "") + " " + (candidate.className || "")).toLowerCase();
+
+    return (
+      text.includes("ververs") ||
+      text === "refresh" ||
+      title.includes("ververs") ||
+      aria.includes("ververs") ||
+      idClass.includes("refresh")
+    );
+  }
+
+  function hideRefreshControls(root = document) {
+    const candidates = root.querySelectorAll
+      ? root.querySelectorAll("button, a, [role='button']")
+      : [];
+    for (const el of candidates) {
+      if (isRefreshControl(el)) {
+        el.classList.add("public-refresh-hidden");
+        el.setAttribute("aria-hidden", "true");
+        el.setAttribute("tabindex", "-1");
+      }
+    }
   }
 
   window.fetch = function(input, init) {
@@ -27,32 +64,39 @@
     }
 
     if (path.endsWith("/api/health")) {
-      return jsonResponse({
-        ok: true,
-        mode: "github-pages",
-        static: true
-      });
+      return jsonResponse({ok: true, mode: "github-pages", static: true});
     }
 
     if (path.endsWith("/api/refresh")) {
+      /* Nooit een publieke scrape proberen. Behandel dit als een geslaagde no-op. */
       return jsonResponse({
-        ok: false,
+        ok: true,
         static: true,
-        message: "De publieke Filmtool wordt dagelijks automatisch om 12:00 bijgewerkt."
-      }, 409);
+        skipped: true,
+        message: "De publieke agenda wordt dagelijks automatisch bijgewerkt."
+      }, 200);
     }
 
     return originalFetch(input, init);
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
-    for (const button of document.querySelectorAll("button")) {
-      const text = (button.textContent || "").trim().toLowerCase();
-      if (text === "verversen" || text === "refresh" || text.includes("ververs data")) {
-        button.disabled = true;
-        button.title = "De publieke Filmtool wordt dagelijks automatisch om 12:00 bijgewerkt.";
-      }
+  /* Blokkeer een refresh-click ook als de knop later door JavaScript wordt opgebouwd. */
+  document.addEventListener("click", (event) => {
+    if (isRefreshControl(event.target)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return false;
     }
+  }, true);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    hideRefreshControls();
+
+    const observer = new MutationObserver(() => hideRefreshControls());
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
   });
 })();
 </script>
