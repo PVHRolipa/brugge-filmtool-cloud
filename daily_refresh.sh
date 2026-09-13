@@ -12,7 +12,7 @@ cd "$PROJECT"
 {
   echo ""
   echo "============================================================"
-  echo "Brugge Filmtool dagelijkse update: $(date '+%Y-%m-%d %H:%M:%S')"
+  echo "Brugge Filmtool update: $(date '+%Y-%m-%d %H:%M:%S')"
   echo "============================================================"
 
   if [ -f "$PROJECT/.venv/bin/activate" ]; then
@@ -33,29 +33,60 @@ cd "$PROJECT"
   }
   trap cleanup EXIT
 
-  for i in {1..20}; do
+  SERVER_READY=0
+  for i in {1..30}; do
     if curl -fsS "http://127.0.0.1:${PORT}/api/health" >/dev/null 2>&1; then
+      SERVER_READY=1
       break
     fi
     sleep 1
   done
 
-  echo "UiT-data verversen..."
+  if [ "$SERVER_READY" -ne 1 ]; then
+    echo "FOUT: lokale Filmtool-server startte niet."
+    exit 1
+  fi
+
+  echo "UiT-data lokaal verversen..."
   curl -fsS -X POST "http://127.0.0.1:${PORT}/api/refresh"
   echo ""
   echo "Refresh voltooid."
 
+  echo "Publieke JSON exporteren..."
+  mkdir -p "$PROJECT/docs/data"
+  TMP_EVENTS="$PROJECT/docs/data/events.json.tmp"
+
+  curl -fsS "http://127.0.0.1:${PORT}/api/events" > "$TMP_EVENTS"
+
+  # Controleer dat de export geldige JSON is voor we de vorige publieke data vervangen.
+  python3 - "$TMP_EVENTS" <<'PY'
+import json, sys
+from pathlib import Path
+p = Path(sys.argv[1])
+with p.open("r", encoding="utf-8") as f:
+    data = json.load(f)
+if data is None:
+    raise SystemExit("Lege JSON-export")
+print("JSON-export geldig.")
+PY
+
+  mv "$TMP_EVENTS" "$PROJECT/docs/data/events.json"
+
   cleanup
   trap - EXIT
 
-  git add data/ web/ *.html *.json *.csv 2>/dev/null || true
+  echo "GitHub Pages-versie bouwen..."
+  python3 "$PROJECT/build_pages.py"
+
+  # Alleen de data en de gebouwde publieke site publiceren.
+  git add data/ docs/ build_pages.py daily_refresh.sh .gitignore 2>/dev/null || true
 
   if git diff --cached --quiet; then
     echo "Geen wijzigingen om te publiceren."
   else
-    git commit -m "Daily film update $(date '+%Y-%m-%d')"
+    git commit -m "Daily film update $(date '+%Y-%m-%d %H:%M')"
     git push origin main
-    echo "Nieuwe Filmtool-data naar GitHub gepusht."
+    echo "Nieuwe Filmtool-data en GitHub Pages-site gepusht."
   fi
 
   echo "Klaar: $(date '+%Y-%m-%d %H:%M:%S')"

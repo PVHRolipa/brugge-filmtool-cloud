@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="nl">
+<head>
+
+<script id="github-pages-static-adapter">
+(() => {
+  const originalFetch = window.fetch.bind(window);
+
+  function jsonResponse(payload, status = 200) {
+    return Promise.resolve(new Response(JSON.stringify(payload), {
+      status,
+      headers: {"Content-Type": "application/json; charset=utf-8"}
+    }));
+  }
+
+  window.fetch = function(input, init) {
+    const raw = typeof input === "string" ? input : (input && input.url) || "";
+    let path = raw;
+    try {
+      path = new URL(raw, window.location.href).pathname;
+    } catch (_) {}
+
+    if (path.endsWith("/api/events")) {
+      return originalFetch("./data/events.json?v=" + Date.now(), {
+        cache: "no-store"
+      });
+    }
+
+    if (path.endsWith("/api/health")) {
+      return jsonResponse({
+        ok: true,
+        mode: "github-pages",
+        static: true
+      });
+    }
+
+    if (path.endsWith("/api/refresh")) {
+      return jsonResponse({
+        ok: false,
+        static: true,
+        message: "De publieke Filmtool wordt dagelijks automatisch om 12:00 bijgewerkt."
+      }, 409);
+    }
+
+    return originalFetch(input, init);
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    for (const button of document.querySelectorAll("button")) {
+      const text = (button.textContent || "").trim().toLowerCase();
+      if (text === "verversen" || text === "refresh" || text.includes("ververs data")) {
+        button.disabled = true;
+        button.title = "De publieke Filmtool wordt dagelijks automatisch om 12:00 bijgewerkt.";
+      }
+    }
+  });
+})();
+</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta id="themeColor" name="theme-color" content="#111318">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Brugge Film">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>Brugge Film Tool</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0d0d11;
+  --bg-soft: #15161b;
+  --panel: rgba(20, 20, 26, 0.94);
+  --panel-2: rgba(29, 29, 37, 0.96);
+  --line: rgba(236, 211, 148, 0.16);
+  --line-strong: rgba(236, 211, 148, 0.28);
+  --ink: #f6f1e4;
+  --muted: #b7b1a3;
+  --gold: #e3bf73;
+  --gold-soft: rgba(227, 191, 115, 0.12);
+  --red: #a53030;
+  --red-soft: rgba(165, 48, 48, 0.16);
+  --teal: #2f7f84;
+  --teal-soft: rgba(47, 127, 132, 0.18);
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(165,48,48,.18), transparent 30%),
+    radial-gradient(circle at top left, rgba(227,191,115,.08), transparent 28%),
+    linear-gradient(180deg, #0b0b10 0%, #13141a 100%);
+  color:var(--ink);
+  min-height:100vh;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; opacity:.08;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 30px, rgba(255,255,255,.5) 30px 31px, transparent 31px 62px),
+    linear-gradient(180deg, transparent, rgba(255,255,255,.08), transparent);
+  mix-blend-mode:soft-light;
+}
+header{
+  padding-top:env(safe-area-inset-top);
+  position:sticky; top:0; z-index:5;
+  backdrop-filter: blur(16px);
+  background:linear-gradient(180deg, rgba(8,8,11,.96), rgba(14,14,18,.93));
+  border-bottom:1px solid var(--line);
+}
+.hero{
+  max-width:1400px; margin:auto; padding:28px 28px 18px;
+}
+.hero-card{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:18px;
+  background:
+    linear-gradient(135deg, rgba(227,191,115,.1), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border:1px solid var(--line-strong);
+  border-radius:22px;
+  padding:26px 24px;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.hero-card::before,
+.hero-card::after{
+  content:""; position:absolute; top:0; bottom:0; width:15px;
+  background:
+    radial-gradient(circle, rgba(8,8,11,.98) 0 4px, transparent 4.4px) center 10px / 100% 28px repeat-y;
+  opacity:.95;
+}
+.hero-card::before{left:0}
+.hero-card::after{right:0}
+.title-wrap{padding:0 16px 0 18px}
+.kicker{
+  display:inline-block; font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:10px;
+}
+.title h1{margin:0 0 8px; font-size:34px; line-height:1.05}
+.title p{margin:0; color:var(--muted); max-width:760px}
+.actions{display:flex; align-items:center; gap:10px; padding:0 18px 0 16px}
+button{
+  border:1px solid var(--line-strong);
+  background:linear-gradient(180deg, #1b1c23, #15161c);
+  color:var(--ink);
+  border-radius:999px;
+  padding:11px 16px;
+  font-size:14px;
+  cursor:pointer;
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
+}
+button:hover{transform:translateY(-1px); border-color:rgba(227,191,115,.45)}
+button.primary{
+  background:linear-gradient(180deg, #b64545, #8f2c2c);
+  border-color:#bf6767;
+  box-shadow:0 8px 24px rgba(165,48,48,.26);
+}
+button:disabled{opacity:.58;cursor:wait;transform:none}
+.controls{
+  max-width:1400px; margin:14px auto 0; padding:0 28px 22px;
+  display:grid; grid-template-columns:minmax(240px,2fr) repeat(3,minmax(150px,1fr)); gap:12px;
+}
+input,select{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid rgba(227,191,115,.18);
+  border-radius:14px;
+  background:rgba(23,24,30,.96);
+  color:var(--ink);
+  font-size:14px;
+  outline:none;
+}
+input::placeholder{color:#928b7d}
+input:focus,select:focus{border-color:rgba(227,191,115,.48); box-shadow:0 0 0 3px rgba(227,191,115,.12)}
+main{max-width:1400px; margin:22px auto; padding:0 28px calc(56px + env(safe-area-inset-bottom))}
+.stats{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px}
+.stat{
+  background:linear-gradient(180deg, rgba(32,33,40,.98), rgba(22,23,29,.95));
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px 15px;
+  min-width:140px;
+  box-shadow:var(--shadow);
+}
+.stat strong{display:block; font-size:24px; color:var(--gold); margin-bottom:2px}
+.stat span{font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em}
+.status{color:var(--muted);font-size:13px;margin:0 0 16px;padding-left:2px}
+.list{display:grid;gap:14px}
+.event{
+  background:linear-gradient(180deg, rgba(26,27,34,.96), rgba(18,18,24,.98));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:150px minmax(220px,1.25fr) minmax(180px,.8fr) minmax(260px,2fr) auto;
+  gap:0;
+}
+.date-block{
+  background:
+    linear-gradient(180deg, rgba(165,48,48,.2), rgba(165,48,48,.07)),
+    linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+  border-right:1px solid var(--line);
+  padding:18px 18px 18px 20px;
+  position:relative;
+}
+.date-block::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:12px;
+  background: radial-gradient(circle, rgba(13,13,17,1) 0 3.5px, transparent 3.9px) center 11px / 100% 27px repeat-y;
+}
+.date{font-weight:700;font-size:15px;line-height:1.35;padding-left:12px}
+.time{font-size:13px;color:#f0d8d8;margin-top:6px;padding-left:12px}
+.content,.venue-wrap,.desc-wrap,.open-wrap{padding:18px 18px}
+.name{font-weight:780;font-size:19px;line-height:1.25;margin-bottom:8px}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.venue{font-size:14px;color:#ded5c3}
+.desc{font-size:14px;line-height:1.5;color:#d1cabd;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.badge{
+  display:inline-flex; align-items:center; gap:7px;
+  font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid transparent;
+  text-transform:uppercase; letter-spacing:.05em; font-weight:650;
+}
+.badge::before{content:""; width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.9}
+.badge-film{background:var(--red-soft); color:#ffb0b0; border-color:rgba(165,48,48,.35)}
+.badge-filmfestival{background:var(--gold-soft); color:#f4dca3; border-color:rgba(227,191,115,.3)}
+.badge-audiovisuele-tentoonstelling{background:var(--teal-soft); color:#8fdce0; border-color:rgba(47,127,132,.3)}
+.badge-filmgerelateerd{background:rgba(255,255,255,.07); color:#d6d0c5; border-color:rgba(255,255,255,.08)}
+.badge-default{background:rgba(255,255,255,.07); color:#d6d0c5; border-color:rgba(255,255,255,.08)}
+.open-wrap{display:flex;align-items:flex-start;justify-content:flex-end;white-space:nowrap}
+.open-link{
+  display:inline-flex; align-items:center; gap:8px;
+  text-decoration:none; color:var(--gold);
+  border:1px solid rgba(227,191,115,.24);
+  border-radius:999px; padding:10px 13px;
+  background:rgba(227,191,115,.08);
+}
+.open-link:hover{background:rgba(227,191,115,.12)}
+.empty{
+  padding:46px 30px;background:linear-gradient(180deg, rgba(26,27,34,.96), rgba(18,18,24,.98));
+  border:1px solid var(--line);border-radius:22px;text-align:center;color:var(--muted)
+}
+small.note{display:block;color:#938e82;margin-top:6px}
+
+/* Theme variants — all retained; the user can switch at any time. */
+body[data-theme="arthouse"]{
+  --bg:#eee7d6; --bg-soft:#f5efe1; --panel:rgba(251,247,238,.96); --panel-2:rgba(244,238,225,.98);
+  --line:rgba(33,39,52,.14); --line-strong:rgba(33,39,52,.25); --ink:#202532; --muted:#6f6d67;
+  --gold:#8b632f; --gold-soft:rgba(139,99,47,.11); --red:#7d2530; --red-soft:rgba(125,37,48,.10);
+  --teal:#486f72; --teal-soft:rgba(72,111,114,.11); --shadow:0 16px 42px rgba(64,52,35,.13); color-scheme:light;
+  background:radial-gradient(circle at top right, rgba(125,37,48,.08), transparent 28%),linear-gradient(180deg,#f5efe1,#e8dfcc);
+}
+body[data-theme="arthouse"] header{background:rgba(245,239,225,.94)}
+body[data-theme="arthouse"] .hero-card,body[data-theme="arthouse"] .stat,body[data-theme="arthouse"] .event,body[data-theme="arthouse"] .empty{background:rgba(252,248,239,.96)}
+body[data-theme="arthouse"] input,body[data-theme="arthouse"] select,body[data-theme="arthouse"] button{background:#faf6ed;color:#202532}
+body[data-theme="arthouse"] .venue,body[data-theme="arthouse"] .desc{color:#4d4c49}
+body[data-theme="arthouse"] .time{color:#7d2530}
+body[data-theme="arthouse"] .date-block{background:linear-gradient(180deg,rgba(125,37,48,.09),rgba(139,99,47,.05))}
+body[data-theme="arthouse"] .date-block::before{background:radial-gradient(circle,#eee7d6 0 3.5px,transparent 3.9px) center 11px/100% 27px repeat-y}
+
+body[data-theme="retro70"]{
+  --bg:#2a2119; --bg-soft:#33281e; --panel:rgba(55,42,30,.97); --panel-2:rgba(67,49,33,.98);
+  --line:rgba(241,193,91,.22); --line-strong:rgba(241,193,91,.36); --ink:#f5dfb3; --muted:#c7a979;
+  --gold:#f1c15b; --gold-soft:rgba(241,193,91,.15); --red:#b74e2f; --red-soft:rgba(183,78,47,.20);
+  --teal:#5d8e7b; --teal-soft:rgba(93,142,123,.18); --shadow:0 18px 55px rgba(0,0,0,.38);
+  background:radial-gradient(circle at 80% 0,rgba(183,78,47,.23),transparent 34%),linear-gradient(180deg,#241b14,#38291c);
+}
+body[data-theme="retro70"] header{background:rgba(38,28,20,.95)}
+body[data-theme="retro70"] .hero-card{border-radius:10px;background:linear-gradient(135deg,rgba(241,193,91,.12),transparent 45%)}
+body[data-theme="retro70"] .event,body[data-theme="retro70"] .stat{border-radius:10px}
+body[data-theme="retro70"] input,body[data-theme="retro70"] select{border-radius:6px;background:#33271d;color:#f5dfb3}
+body[data-theme="retro70"] button,body[data-theme="retro70"] .open-link{border-radius:6px}
+
+body[data-theme="genre"]{
+  --bg:#050506; --bg-soft:#0a0a0d; --panel:rgba(8,8,11,.82); --panel-2:rgba(10,10,13,.88);
+  --line:rgba(231,28,36,.24); --line-strong:rgba(231,28,36,.52); --ink:#f5f5f5; --muted:#b0b0b8;
+  --gold:#efefef; --gold-soft:rgba(255,255,255,.08); --red:#e11c24; --red-soft:rgba(225,28,36,.18);
+  --teal:#6f36b6; --teal-soft:rgba(111,54,182,.18); --shadow:0 22px 76px rgba(0,0,0,.58);
+  background:
+    radial-gradient(circle at 84% 10%, rgba(225,28,36,.18), transparent 24%),
+    linear-gradient(180deg, rgba(4,4,6,.18), rgba(4,4,7,.3)),
+    url('./web/genre-night-bg.png') center top / cover no-repeat fixed,
+    linear-gradient(180deg,#030304,#0b0b0e);
+}
+body[data-theme="genre"]::before{
+  opacity:1;
+  background:
+    linear-gradient(180deg, rgba(3,3,5,.54) 0%, rgba(3,3,5,.76) 40%, rgba(5,5,7,.88) 100%),
+    radial-gradient(circle at 20% 22%, rgba(111,54,182,.10), transparent 24%),
+    radial-gradient(circle at 82% 28%, rgba(225,28,36,.10), transparent 20%);
+  mix-blend-mode:normal;
+}
+body[data-theme="genre"] header{background:linear-gradient(180deg, rgba(7,7,10,.84), rgba(7,7,10,.72)); border-bottom-color:rgba(231,28,36,.22)}
+body[data-theme="genre"] .kicker,body[data-theme="genre"] .stat strong,body[data-theme="genre"] .open-link{color:#ff3b42}
+body[data-theme="genre"] .hero-card{
+  background:linear-gradient(180deg, rgba(10,10,14,.72), rgba(10,10,13,.62));
+  border-color:rgba(225,28,36,.42);
+  box-shadow:0 0 0 1px rgba(225,28,36,.1),0 20px 80px rgba(0,0,0,.48);
+}
+body[data-theme="genre"] .stat,
+body[data-theme="genre"] .event,
+body[data-theme="genre"] .empty{background:linear-gradient(180deg, rgba(8,8,11,.78), rgba(10,10,13,.88))}
+body[data-theme="genre"] .event{backdrop-filter: blur(4px)}
+body[data-theme="genre"] .date-block{
+  background:linear-gradient(180deg, rgba(225,28,36,.24), rgba(225,28,36,.10)), linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+}
+body[data-theme="genre"] .date-block::before{background: radial-gradient(circle, rgba(5,5,6,1) 0 3.5px, transparent 3.9px) center 11px / 100% 27px repeat-y}
+body[data-theme="genre"] .desc{color:#dfdfe5}
+body[data-theme="genre"] .venue{color:#e2e2e6}
+body[data-theme="genre"] button.primary{background:linear-gradient(180deg,#ef2730,#9f0e14);border-color:#ff5258}
+body[data-theme="genre"] .open-link{background:rgba(225,28,36,.10);border-color:rgba(225,28,36,.32)}
+body[data-theme="genre"] .open-link:hover{background:rgba(225,28,36,.16)}
+@media(max-width:850px){
+  body[data-theme="genre"]{background:
+    linear-gradient(180deg, rgba(4,4,6,.20), rgba(4,4,7,.34)),
+    url('./web/genre-night-bg.png') center top / cover no-repeat,
+    linear-gradient(180deg,#030304,#0b0b0e);
+  }
+}
+
+
+/* UiT in Brugge — closer to the public UiTkalender: clean white canvas, editorial cards. */
+.uit-toolbar,.uit-poster{display:none}
+body[data-theme="uitbrugge"]{
+  --bg:#ffffff; --bg-soft:#ffffff; --panel:#ffffff; --panel-2:#ffffff;
+  --line:#dedede; --line-strong:#c8c8c8; --ink:#171717; --muted:#696969;
+  --gold:#171717; --gold-soft:#f4f4f4; --red:#ffd500; --red-soft:#fff4a7;
+  --teal:#2f756c; --teal-soft:#e5f1ef; --shadow:none;
+  color-scheme:light;
+  background:#ffffff;
+  color:#171717;
+}
+body[data-theme="uitbrugge"]::before{display:none}
+body[data-theme="uitbrugge"] header{
+  position:static;backdrop-filter:none;background:#fff;border-bottom:1px solid #e5e5e5;
+}
+body[data-theme="uitbrugge"] .hero{max-width:1320px;padding:34px 28px 18px}
+body[data-theme="uitbrugge"] .hero-card{
+  background:#fff;border:0;box-shadow:none;border-radius:0;padding:0;align-items:flex-start;
+}
+body[data-theme="uitbrugge"] .hero-card::before,
+body[data-theme="uitbrugge"] .hero-card::after{display:none}
+body[data-theme="uitbrugge"] .title-wrap{padding:0}
+body[data-theme="uitbrugge"] .kicker{display:none}
+body[data-theme="uitbrugge"] .title h1{
+  font-size:46px;line-height:1;letter-spacing:-.045em;color:#111;margin:0 0 10px;text-transform:uppercase;font-weight:850
+}
+body[data-theme="uitbrugge"] .title p{font-size:16px;line-height:1.45;color:#5f5f5f;max-width:720px}
+body[data-theme="uitbrugge"] .actions{padding:0;align-self:flex-start;gap:9px}
+body[data-theme="uitbrugge"] button{
+  border-radius:0;background:#fff;color:#171717;border:1px solid #bdbdbd;box-shadow:none;font-weight:700
+}
+body[data-theme="uitbrugge"] button.primary{
+  background:#ffd500;color:#111;border-color:#ffd500;box-shadow:none
+}
+body[data-theme="uitbrugge"] .controls{
+  max-width:1320px;margin:0 auto;padding:22px 28px 28px;background:#fff;
+  grid-template-columns:minmax(320px,2.2fr) minmax(170px,.8fr) minmax(170px,.8fr) minmax(170px,.8fr);
+  border-top:1px solid #eeeeee;
+}
+body[data-theme="uitbrugge"] input,
+body[data-theme="uitbrugge"] select{
+  border-radius:0;background:#fff;color:#171717;border:1px solid #bdbdbd;padding:13px 14px;
+}
+body[data-theme="uitbrugge"] input:focus,
+body[data-theme="uitbrugge"] select:focus{border-color:#111;box-shadow:0 0 0 2px rgba(255,213,0,.35)}
+body[data-theme="uitbrugge"] main{max-width:1320px;margin:0 auto;padding:30px 28px 70px;background:#fff}
+body[data-theme="uitbrugge"] .stats{display:none}
+body[data-theme="uitbrugge"] .status{margin:0 0 18px;color:#767676;font-size:12px}
+body[data-theme="uitbrugge"] .uit-toolbar{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  margin:0 0 30px;padding:0 0 18px;border-bottom:1px solid #d9d9d9;
+}
+body[data-theme="uitbrugge"] .uit-left{display:flex;flex-direction:column;gap:13px}
+body[data-theme="uitbrugge"] .results-count{font-size:18px;font-weight:800;color:#111}
+body[data-theme="uitbrugge"] .filter-chips{display:flex;gap:7px;flex-wrap:wrap}
+body[data-theme="uitbrugge"] .filter-chip{
+  min-height:36px;padding:7px 11px;border-radius:0;border:1px solid #bdbdbd;background:#fff;color:#171717;font-size:13px;font-weight:700;cursor:pointer
+}
+body[data-theme="uitbrugge"] .filter-chip.active{background:#ffd500;border-color:#ffd500;color:#111}
+body[data-theme="uitbrugge"] .sort-wrap{display:flex;align-items:center;gap:8px;color:#676767;font-size:13px}
+body[data-theme="uitbrugge"] .sort-select{width:auto;min-width:145px}
+body[data-theme="uitbrugge"] .list{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:38px 26px;
+}
+body[data-theme="uitbrugge"] .event{
+  display:flex;flex-direction:column;min-width:0;background:#fff;border:0;border-radius:0;
+  overflow:visible;box-shadow:none;gap:0;padding-bottom:22px;border-bottom:1px solid #dadada;
+}
+body[data-theme="uitbrugge"] .uit-poster{
+  display:flex;position:relative;aspect-ratio:1.38/1;min-height:0;padding:0;align-items:flex-end;
+  background:#ededed;color:#fff;overflow:hidden;margin-bottom:15px;
+}
+body[data-theme="uitbrugge"] .uit-poster::before{display:none}
+body[data-theme="uitbrugge"] .poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:0}
+body[data-theme="uitbrugge"] .uit-poster.has-image .poster-image{display:block}
+body[data-theme="uitbrugge"] .uit-poster.has-image .poster-mark{display:none}
+body[data-theme="uitbrugge"] .uit-poster.has-image::after{display:none}
+body[data-theme="uitbrugge"] .poster-mark{
+  position:relative;z-index:1;font-size:48px;font-weight:900;line-height:.9;letter-spacing:-.06em;
+  max-width:80%;word-break:break-word;color:#171717;padding:20px
+}
+body[data-theme="uitbrugge"] .poster-badge{display:none}
+body[data-theme="uitbrugge"] .uit-date-banner{
+  /* Contour traced from the supplied UiT in Brugge date badge (157 × 53). */
+  position:absolute;left:0;top:14px;z-index:4;display:grid;grid-template-columns:36px 67px 54px;align-items:center;
+  width:157px;height:53px;background:#fff;color:#050505;box-shadow:none;overflow:hidden;
+  font-family:Arial,Helvetica,sans-serif;
+  clip-path:polygon(
+    21.66% 1.89%,21.02% 3.77%,0% 3.77%,0% 66.04%,13.38% 66.04%,14.01% 67.92%,
+    14.01% 84.91%,14.65% 86.79%,14.65% 88.68%,16.56% 94.34%,17.20% 94.34%,17.83% 96.23%,
+    94.90% 96.23%,95.54% 94.34%,96.18% 94.34%,97.45% 90.57%,97.45% 88.68%,98.09% 86.79%,
+    98.09% 84.91%,98.73% 83.02%,98.73% 45.28%,98.09% 43.40%,98.09% 41.51%,96.18% 35.85%,
+    95.54% 35.85%,94.90% 33.96%,94.27% 33.96%,93.63% 32.08%,84.08% 32.08%,83.44% 30.19%,
+    83.44% 13.21%,80.89% 5.66%,80.25% 5.66%,79.62% 3.77%,68.15% 3.77%,67.52% 1.89%,
+    66.24% 1.89%,65.61% 3.77%,62.42% 3.77%,61.78% 1.89%
+  )
+}
+body[data-theme="uitbrugge"] .uit-date-banner::before,
+body[data-theme="uitbrugge"] .uit-date-banner::after{display:none}
+body[data-theme="uitbrugge"] .uit-date-weekday{
+  font-size:15px;font-weight:800;line-height:1;text-align:right;text-transform:lowercase;padding-right:1px;align-self:start;margin-top:12px
+}
+body[data-theme="uitbrugge"] .uit-date-day{
+  font-size:47px;font-weight:900;line-height:.88;letter-spacing:-.055em;text-align:center;font-variant-numeric:tabular-nums;align-self:center;margin-top:-1px
+}
+body[data-theme="uitbrugge"] .uit-date-month{
+  font-size:15px;font-weight:800;line-height:1;text-transform:lowercase;align-self:end;margin-bottom:10px;padding-left:1px
+}
+body[data-theme="uitbrugge"] .uit-date-time{display:none}
+body[data-theme="uitbrugge"] .date-block{display:flex;order:2;padding:0 0 9px;border:0;background:none;align-items:center}
+body[data-theme="uitbrugge"] .date-block::before{display:none}
+body[data-theme="uitbrugge"] .date{display:none}
+body[data-theme="uitbrugge"] .time{padding:0;margin:0;font-size:13px;color:#5f5f5f;font-weight:650}
+body[data-theme="uitbrugge"] .time::before{content:""}
+body[data-theme="uitbrugge"] .content{order:3;padding:0;display:flex;flex-direction:column}
+body[data-theme="uitbrugge"] .meta-row{
+  display:block;order:1;margin:0 0 9px;color:#111;font-size:13px;line-height:1.25
+}
+body[data-theme="uitbrugge"] .meta-row::before{
+  content:"Thema is";display:block;color:#777;font-size:12px;font-weight:500;margin-bottom:2px
+}
+body[data-theme="uitbrugge"] .meta-row .badge{
+  display:block;background:none;border:0;color:#111;padding:0;margin:0;border-radius:0;text-transform:none;letter-spacing:0;font-size:13px;font-weight:800
+}
+body[data-theme="uitbrugge"] .meta-row .badge::before{display:none}
+body[data-theme="uitbrugge"] .name{order:2;font-size:21px;line-height:1.18;color:#111;margin:0 0 12px;font-weight:850}
+body[data-theme="uitbrugge"] .venue-wrap{order:4;padding:0 0 0}
+body[data-theme="uitbrugge"] .venue{font-size:13px;line-height:1.4;color:#444;font-weight:600}
+body[data-theme="uitbrugge"] .desc-wrap{display:none}
+body[data-theme="uitbrugge"] .open-wrap{
+  order:5;padding:15px 0 0;justify-content:flex-start;align-items:center;border:0;margin-top:auto
+}
+body[data-theme="uitbrugge"] .open-link{
+  background:transparent;border:0;border-radius:0;padding:0;color:#111;text-decoration:underline;text-underline-offset:3px;font-weight:800;font-size:13px
+}
+body[data-theme="uitbrugge"] .open-link:hover{background:transparent;text-decoration-thickness:2px}
+body[data-theme="uitbrugge"] .date-pill{display:none}
+body[data-theme="uitbrugge"] .empty{background:#fff;border:1px solid #ddd;color:#666;box-shadow:none;border-radius:0}
+body[data-theme="uitbrugge"] .theme-select{border-radius:0;min-width:175px}
+@media(max-width:1050px){body[data-theme="uitbrugge"] .list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){
+  body[data-theme="uitbrugge"] .title h1{font-size:36px}
+  body[data-theme="uitbrugge"] .controls{grid-template-columns:1fr}
+  body[data-theme="uitbrugge"] .list{grid-template-columns:1fr}
+  body[data-theme="uitbrugge"] .uit-toolbar{align-items:flex-start;flex-direction:column}
+}
+
+
+/* Razor Reel — image-led, bold editorial festival look inspired by razorreel.com */
+body[data-theme="razorreel"]{
+  color-scheme:light;
+  --rr-pink:#d93662;
+  --rr-black:#060606;
+  --rr-paper:#ffffff;
+  --rr-grey:#d8d8d2;
+  background:var(--rr-paper);
+  color:var(--rr-black);
+  font-family:Arial,Helvetica,sans-serif;
+}
+body[data-theme="razorreel"]::before{display:none}
+body[data-theme="razorreel"] header{
+  position:sticky;top:0;
+  background:rgba(245,245,242,.97);
+  border-bottom:4px solid var(--rr-black);
+  backdrop-filter:blur(10px);
+}
+body[data-theme="razorreel"] .hero{max-width:1380px;padding:20px 28px 10px}
+body[data-theme="razorreel"] .hero-card{
+  min-height:160px;
+  align-items:flex-end;
+  border:0;border-radius:0;box-shadow:none;
+  background:var(--rr-black);
+  padding:24px 26px 22px;
+  overflow:hidden;
+}
+body[data-theme="razorreel"] .hero-card::before{
+  display:block;
+  content:"";
+  position:absolute;inset:0 auto 0 0;width:14px;
+  background:var(--rr-pink);
+  opacity:1;
+}
+body[data-theme="razorreel"] .hero-card::after{display:none}
+body[data-theme="razorreel"] .title-wrap{padding:0 20px}
+body[data-theme="razorreel"] .kicker{
+  color:#fff;display:block;margin:0 0 4px;
+  font-size:15px;font-weight:700;letter-spacing:.02em;text-transform:lowercase;
+}
+body[data-theme="razorreel"] .title h1{
+  color:#fff;margin:0;
+  font-family:Impact,"Arial Black",Arial,sans-serif;
+  font-size:74px;line-height:.82;letter-spacing:-.035em;text-transform:uppercase;
+}
+body[data-theme="razorreel"] .title p{
+  color:var(--rr-pink);margin-top:10px;
+  font-size:15px;font-weight:900;letter-spacing:.035em;text-transform:uppercase;
+}
+body[data-theme="razorreel"] .actions{padding:0;align-items:flex-end}
+body[data-theme="razorreel"] button,
+body[data-theme="razorreel"] .theme-select,
+body[data-theme="razorreel"] input,
+body[data-theme="razorreel"] select{
+  border-radius:0;border:2px solid var(--rr-black);
+  background:#fff;color:#080808;box-shadow:none;
+  font-weight:800;
+}
+body[data-theme="razorreel"] button.primary{
+  background:var(--rr-pink);color:#fff;border-color:var(--rr-pink);box-shadow:none;
+  text-transform:uppercase;letter-spacing:.03em;
+}
+body[data-theme="razorreel"] button:hover{transform:none;background:#111;color:#fff;border-color:#111}
+body[data-theme="razorreel"] button.primary:hover{background:#111;border-color:#111}
+body[data-theme="razorreel"] .controls{
+  max-width:1380px;margin:0 auto;padding:12px 28px 18px;background:#fff;
+  grid-template-columns:minmax(260px,2fr) repeat(3,minmax(150px,1fr));gap:8px;
+}
+body[data-theme="razorreel"] input:focus,
+body[data-theme="razorreel"] select:focus{border-color:var(--rr-pink);box-shadow:none}
+body[data-theme="razorreel"] main{max-width:1380px;margin:0 auto;padding:24px 28px 64px}
+body[data-theme="razorreel"] .stats{display:none}
+body[data-theme="razorreel"] .stat{
+  min-width:0;flex:1;border:0;border-right:1px solid #bbb;border-radius:0;box-shadow:none;
+  background:transparent;padding:10px 12px;
+}
+body[data-theme="razorreel"] .stat:last-child{border-right:0}
+body[data-theme="razorreel"] .stat strong{color:var(--rr-pink);font-family:Impact,"Arial Black",sans-serif;font-size:30px;line-height:1}
+body[data-theme="razorreel"] .stat span{color:#111;font-size:11px;font-weight:900;letter-spacing:.06em}
+body[data-theme="razorreel"] .status{display:none}
+body[data-theme="razorreel"] .uit-toolbar{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+  border-top:3px solid var(--rr-black);padding-top:12px;margin:0 0 18px;
+}
+body[data-theme="razorreel"] .results-count{
+  color:#777;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;text-transform:none;letter-spacing:0;
+}
+body[data-theme="razorreel"] .filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+body[data-theme="razorreel"] .filter-chip{
+  border:2px solid #111;background:#fff;color:#111;border-radius:0;padding:7px 9px;
+  font-size:11px;font-weight:900;text-transform:uppercase;
+}
+body[data-theme="razorreel"] .filter-chip.active{background:var(--rr-pink);border-color:var(--rr-pink);color:#fff}
+body[data-theme="razorreel"] .sort-wrap{color:#111;font-weight:700}
+body[data-theme="razorreel"] .list{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 20px;
+}
+body[data-theme="razorreel"] .event{
+  display:flex;flex-direction:column;
+  background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;
+  min-width:0;
+}
+body[data-theme="razorreel"] .uit-poster{
+  display:block;order:1;position:relative;width:100%;aspect-ratio:4/3;
+  background:#101010;overflow:hidden;margin:0 0 0;
+}
+body[data-theme="razorreel"] .poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;filter:saturate(.82) contrast(1.08)}
+body[data-theme="razorreel"] .uit-poster.has-image .poster-image{display:block}
+body[data-theme="razorreel"] .poster-mark{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:Impact,"Arial Black",sans-serif;font-size:58px;letter-spacing:-.05em;
+  background:linear-gradient(135deg,#111,#323232);
+}
+body[data-theme="razorreel"] .uit-poster.has-image .poster-mark{display:none}
+body[data-theme="razorreel"] .poster-badge{
+  display:block;position:absolute;left:0;bottom:0;z-index:3;
+  background:var(--rr-pink);color:#fff;padding:7px 10px;
+  font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.055em;
+}
+body[data-theme="razorreel"] .uit-date-banner{display:none}
+body[data-theme="razorreel"] .date-block{
+  order:2;display:flex;align-items:center;justify-content:space-between;
+  background:#fff;border:0;border-bottom:2px solid #111;padding:10px 0 8px;
+}
+body[data-theme="razorreel"] .date-block::before{display:none}
+body[data-theme="razorreel"] .date{padding:0;color:#111;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.045em}
+body[data-theme="razorreel"] .time{padding:0;margin:0;color:var(--rr-pink);font-size:13px;font-weight:900}
+body[data-theme="razorreel"] .content{order:3;padding:11px 0 0}
+body[data-theme="razorreel"] .name{
+  color:var(--rr-pink);font-family:Impact,"Arial Black",Arial,sans-serif;
+  font-size:29px;line-height:.98;letter-spacing:-.015em;text-transform:uppercase;margin:0 0 10px;
+}
+body[data-theme="razorreel"] .meta-row{margin-bottom:2px}
+body[data-theme="razorreel"] .badge{
+  border:0;border-radius:0;background:transparent!important;color:var(--rr-pink)!important;padding:0;
+  font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+}
+body[data-theme="razorreel"] .badge::before{display:none}
+body[data-theme="razorreel"] .venue-wrap{order:4;padding:0 0 9px}
+body[data-theme="razorreel"] .venue{color:#555;font-size:12px;font-weight:800;text-transform:uppercase}
+body[data-theme="razorreel"] .desc-wrap{order:5;padding:0}
+body[data-theme="razorreel"] .desc{color:#333;font-size:13px;line-height:1.45;-webkit-line-clamp:3}
+body[data-theme="razorreel"] .open-wrap{
+  order:6;padding:13px 0 0;margin-top:auto;display:flex;justify-content:flex-start;align-items:center;gap:10px;
+}
+body[data-theme="razorreel"] .open-link{
+  border:0;border-radius:0;background:var(--rr-black);color:#fff;text-decoration:none;
+  padding:9px 12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;
+}
+body[data-theme="razorreel"] .open-link:hover{background:var(--rr-pink)}
+body[data-theme="razorreel"] .date-pill{
+  display:inline-block;background:var(--rr-pink);color:#fff;padding:7px 9px;font-size:11px;font-weight:900;
+}
+body[data-theme="razorreel"] .empty{background:#fff;border:3px solid #111;border-radius:0;box-shadow:none;color:#111}
+@media(max-width:1050px){body[data-theme="razorreel"] .list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){
+  body[data-theme="razorreel"]{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+  body[data-theme="razorreel"] .hero{padding:10px 12px 8px}
+  body[data-theme="razorreel"] .hero-card{min-height:0;padding:17px 14px 15px;display:block}
+  body[data-theme="razorreel"] .title-wrap{padding-left:12px}
+  body[data-theme="razorreel"] .kicker{font-size:11px}
+  body[data-theme="razorreel"] .title h1{font-size:50px}
+  body[data-theme="razorreel"] .title p{font-size:10px;margin-top:7px}
+  body[data-theme="razorreel"] .actions{display:none}
+  body[data-theme="razorreel"] .controls{background:#f5f5f2;border-color:#111}
+  body[data-theme="razorreel"] main{padding:14px 12px 20px}
+  body[data-theme="razorreel"] .stats{display:none}
+  body[data-theme="razorreel"] .uit-toolbar{align-items:flex-start;flex-direction:column;gap:8px;border-top-width:2px}
+  body[data-theme="razorreel"] .filter-chips{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:3px;scrollbar-width:none}
+  body[data-theme="razorreel"] .filter-chips::-webkit-scrollbar{display:none}
+  body[data-theme="razorreel"] .filter-chip{flex:0 0 auto;min-height:36px}
+  body[data-theme="razorreel"] .sort-wrap{display:none}
+  body[data-theme="razorreel"] .list{grid-template-columns:1fr;gap:26px}
+  body[data-theme="razorreel"] .uit-poster{aspect-ratio:16/10}
+  body[data-theme="razorreel"] .name{font-size:28px}
+  body[data-theme="razorreel"] .mobile-dock{background:#050505;border-color:#050505;box-shadow:none}
+  body[data-theme="razorreel"] .mobile-dock button{color:#fff}
+  body[data-theme="razorreel"] .mobile-dock button+button{border-left-color:#444}
+}
+
+.theme-select{min-width:165px;border-radius:999px;padding:10px 34px 10px 13px}
+
+@media (max-width:1080px){
+  .event{grid-template-columns:150px 1.2fr .9fr 1.7fr}
+  .open-wrap{grid-column:2 / -1; padding-top:0; justify-content:flex-start}
+}
+@media(max-width:950px){
+  header{position:static}
+  .controls{grid-template-columns:1fr 1fr}
+  .hero-card{flex-direction:column; align-items:flex-start}
+  .actions{padding-left:18px}
+  .event{grid-template-columns:150px 1fr}
+  .venue-wrap,.desc-wrap,.open-wrap{grid-column:2}
+}
+@media(max-width:620px){
+  .hero{padding:18px 14px 14px}
+  .controls{padding:0 14px 18px; grid-template-columns:1fr}
+  main{padding:0 14px 42px}
+  .title h1{font-size:28px}
+  .event{grid-template-columns:1fr}
+  .date-block,.content,.venue-wrap,.desc-wrap,.open-wrap{grid-column:1}
+  .date-block{border-right:0;border-bottom:1px solid var(--line)}
+}
+
+
+/* iPhone / small-screen interaction layer */
+.mobile-filter-head,.mobile-dock{display:none}
+@media(max-width:720px){
+  html{scroll-padding-bottom:92px}
+  body{padding-bottom:calc(78px + env(safe-area-inset-bottom));-webkit-tap-highlight-color:transparent}
+  body::before{display:none}
+  header{position:static;padding-top:env(safe-area-inset-top)}
+  .hero{padding:12px 12px 6px}
+  .hero-card{padding:15px 14px;border-radius:17px;gap:12px;align-items:flex-start}
+  .hero-card::before,.hero-card::after{width:10px;background-size:100% 24px}
+  .title-wrap{padding:0 8px}
+  .kicker{font-size:10px;margin-bottom:6px}
+  .title h1{font-size:25px;margin-bottom:3px}
+  .title p{display:none}
+  .actions{padding:0 8px;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+  .actions .theme-select{min-width:0;width:100%;height:44px}
+  .actions #refresh{height:44px;padding:0 13px;white-space:nowrap}
+  button,input,select,.open-link{min-height:44px}
+
+  .controls{
+    display:grid!important;
+    position:fixed;z-index:50;left:0;right:0;bottom:0;
+    margin:0;padding:12px 14px calc(16px + env(safe-area-inset-bottom));
+    grid-template-columns:1fr!important;gap:10px;
+    background:var(--bg-soft);border-top:1px solid var(--line-strong);
+    border-radius:20px 20px 0 0;box-shadow:0 -20px 60px rgba(0,0,0,.42);
+    transform:translateY(110%);transition:transform .22s ease;
+    max-height:min(78vh,620px);overflow:auto;
+  }
+  body.mobile-filters-open header{z-index:50}
+  body.mobile-filters-open .hero{opacity:0;pointer-events:none}
+  body.mobile-filters-open .controls{transform:translateY(0);z-index:60}
+  body.mobile-filters-open::after{content:"";position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.48);backdrop-filter:blur(2px)}
+  .mobile-filter-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:2px}
+  .mobile-filter-head strong{font-size:16px}
+  .mobile-filter-head button{min-height:38px;padding:7px 12px}
+  .controls input,.controls select{font-size:16px;min-height:48px}
+
+  main{margin:14px auto;padding:0 12px calc(18px + env(safe-area-inset-bottom))}
+  .stats{gap:8px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;scrollbar-width:none}
+  .stats::-webkit-scrollbar{display:none}
+  .stat{min-width:116px;padding:10px 12px;border-radius:13px;box-shadow:none}
+  .stat strong{font-size:21px}
+  .status{font-size:12px;line-height:1.35;margin:0 2px 12px}
+
+  .event{grid-template-columns:1fr;border-radius:17px}
+  .date-block,.content,.venue-wrap,.desc-wrap,.open-wrap{grid-column:1}
+  .date-block{border-right:0;border-bottom:1px solid var(--line);padding:13px 15px;display:flex;align-items:center;gap:9px}
+  .date{padding-left:10px;font-size:13px}
+  .time{padding-left:0;margin-top:0;font-size:13px}
+  .content{padding:15px 15px 8px}
+  .name{font-size:18px;margin-bottom:7px}
+  .venue-wrap{padding:5px 15px 5px}
+  .desc-wrap{padding:8px 15px 4px}
+  .desc{-webkit-line-clamp:3;font-size:13px}
+  .open-wrap{padding:12px 15px 15px;justify-content:space-between;align-items:center;gap:10px}
+  .open-link{padding:10px 13px;justify-content:center;flex:1}
+
+  .mobile-dock{
+    display:grid;grid-template-columns:repeat(3,1fr);position:fixed;z-index:40;
+    left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom));
+    background:rgba(18,18,23,.93);border:1px solid var(--line-strong);border-radius:18px;
+    box-shadow:0 14px 44px rgba(0,0,0,.42);backdrop-filter:blur(18px);overflow:hidden;
+  }
+  .mobile-dock button{border:0;border-radius:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:7px 5px;color:var(--ink);font-size:11px;min-height:54px}
+  .mobile-dock button+button{border-left:1px solid var(--line)}
+  .dock-icon{font-size:20px;line-height:1}
+
+  /* UiT in Brugge on iPhone */
+  body[data-theme="uitbrugge"]{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+  body[data-theme="uitbrugge"] .hero{padding:15px 14px 6px}
+  body[data-theme="uitbrugge"] .hero-card{padding:0;display:flex;gap:12px}
+  body[data-theme="uitbrugge"] .title h1{font-size:30px;margin-bottom:3px}
+  body[data-theme="uitbrugge"] .title p{display:none}
+  body[data-theme="uitbrugge"] .actions{padding:0;width:100%;grid-template-columns:minmax(0,1fr) auto}
+  body[data-theme="uitbrugge"] .controls{background:#fff;border-color:#d9d9d9}
+  body[data-theme="uitbrugge"].mobile-filters-open::after{background:rgba(0,0,0,.32)}
+  body[data-theme="uitbrugge"] main{padding:14px 12px 18px}
+  body[data-theme="uitbrugge"] .uit-toolbar{margin-bottom:12px;padding-bottom:10px;gap:8px}
+  body[data-theme="uitbrugge"] .uit-left{width:100%;gap:9px}
+  body[data-theme="uitbrugge"] .results-count{font-size:14px}
+  body[data-theme="uitbrugge"] .filter-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px;scrollbar-width:none;width:100%}
+  body[data-theme="uitbrugge"] .filter-chips::-webkit-scrollbar{display:none}
+  body[data-theme="uitbrugge"] .filter-chip{flex:0 0 auto;min-height:38px;padding:7px 11px}
+  body[data-theme="uitbrugge"] .sort-wrap{display:none}
+  body[data-theme="uitbrugge"] .list{grid-template-columns:1fr;gap:14px}
+  body[data-theme="uitbrugge"] .event{border-radius:0}
+  body[data-theme="uitbrugge"] .uit-poster{min-height:0;aspect-ratio:16/10;padding:0;margin-bottom:12px}
+  body[data-theme="uitbrugge"] .poster-mark{font-size:42px;padding:16px}
+  body[data-theme="uitbrugge"] .poster-badge{display:none}
+  body[data-theme="uitbrugge"] .uit-date-banner{top:10px;transform:scale(.90);transform-origin:left top}
+
+  body[data-theme="uitbrugge"] .content{padding:0}
+  body[data-theme="uitbrugge"] .name{font-size:20px}
+  body[data-theme="uitbrugge"] .date-block{padding:0 0 8px;border:0;display:flex}
+  body[data-theme="uitbrugge"] .venue-wrap{padding:0}
+  body[data-theme="uitbrugge"] .desc-wrap{display:none}
+  body[data-theme="uitbrugge"] .desc{-webkit-line-clamp:3}
+  body[data-theme="uitbrugge"] .open-wrap{padding:14px 0 0;margin-top:auto}
+  body[data-theme="uitbrugge"] .mobile-dock{background:rgba(255,255,255,.97);border-color:#d1d1d1;box-shadow:0 10px 30px rgba(0,0,0,.14)}
+  body[data-theme="uitbrugge"] .mobile-dock button{color:#222}
+  body[data-theme="uitbrugge"] .mobile-dock button+button{border-left-color:#e1e1e1}
+}
+@media(min-width:721px){body.mobile-filters-open::after{display:none}}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <div class="hero-card">
+      <div class="title-wrap title">
+        <span class="kicker">Brugge op het scherm</span>
+        <h1>Brugge Film Tool</h1>
+        <p>Een cinematische bladerlaag boven UiTinVlaanderen voor Brugge — film, filmfestivals en aanverwante audiovisuele events in de komende 120 dagen.</p>
+      </div>
+      <div class="actions">
+        <select id="theme" class="theme-select" aria-label="Kies skin">
+          <option value="noir">Cinema Noir</option>
+          <option value="arthouse">Arthouse</option>
+          <option value="retro70">Retro 70s</option>
+          <option value="genre">Genre Night</option>
+          <option value="uitbrugge">UiT in Brugge</option>
+          <option value="razorreel">Razor Reel</option>
+        </select>
+        <button id="refresh" class="primary">UiT verversen</button>
+      </div>
+    </div>
+  </div>
+  <div class="controls" id="filtersPanel">
+    <div class="mobile-filter-head">
+      <strong>Zoeken & filters</strong>
+      <button id="closeFilters" type="button" aria-label="Sluit filters">Sluiten</button>
+    </div>
+    <input id="search" type="search" placeholder="Zoek titel, locatie of beschrijving…">
+    <select id="category"><option value="">Alle categorieën</option></select>
+    <select id="venue"><option value="">Alle locaties</option></select>
+    <select id="period"><option value="all">Volledige periode</option><option value="14">Komende 14 dagen</option><option value="30">Komende 30 dagen</option><option value="60">Komende 60 dagen</option></select>
+  </div>
+</header>
+<main>
+  <div id="stats" class="stats"><div class="stat"><strong id="count">0</strong><span>zichtbaar</span></div></div>
+  <p id="status" class="status">Gegevens laden…</p>
+  <div class="uit-toolbar" id="uitToolbar">
+    <div class="uit-left">
+      <div class="results-count" id="resultsCount">0 resultaten gevonden</div>
+      <div class="filter-chips" id="quickFilters"></div>
+    </div>
+    <div class="sort-wrap">
+      <label for="sort">Sorteer op</label>
+      <select id="sort" class="sort-select">
+        <option value="date">Datum</option>
+        <option value="title">Titel</option>
+        <option value="venue">Locatie</option>
+      </select>
+      <button id="resetFilters" type="button">Filters resetten</button>
+    </div>
+  </div>
+  <div id="list" class="list"></div>
+</main>
+<nav class="mobile-dock" aria-label="Mobiele bediening">
+  <button id="mobileFilters" type="button"><span class="dock-icon">⌕</span><span>Filters</span></button>
+  <button id="mobileTheme" type="button"><span class="dock-icon">◐</span><span>Skin</span></button>
+  <button id="mobileTop" type="button"><span class="dock-icon">↑</span><span>Boven</span></button>
+</nav>
+<script>
+let events=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtDate=s=>{const d=new Date(s+'T12:00:00');return new Intl.DateTimeFormat('nl-BE',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).format(d)};
+const fmtUitDate=s=>{const d=new Date(s+'T12:00:00');return new Intl.DateTimeFormat('nl-BE',{weekday:'short',day:'numeric',month:'short'}).format(d).replace(/\.$/,'')};
+const uitDateParts=s=>{const d=new Date(s+'T12:00:00');const weekday=new Intl.DateTimeFormat('nl-BE',{weekday:'short'}).format(d).replace(/\.$/,'').toLowerCase();const day=String(d.getDate());const month=new Intl.DateTimeFormat('nl-BE',{month:'short'}).format(d).replace(/\.$/,'').toLowerCase();return {weekday,day,month};};
+const slug=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'default';
+const normText=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+const titleStop=new Set(['a','an','and','de','een','en','het','of','the','van']);
+function sameTitle(a,b){
+ const left=normText(a), right=normText(b);
+ if(!left||!right) return false;
+ if(left===right) return true;
+ const pair=[left,right].sort((x,y)=>x.length-y.length), shorter=pair[0], longer=pair[1];
+ if(shorter.length>=12 && longer.includes(shorter)) return true;
+ const lt=[...new Set(left.split(' ').filter(t=>t&&!titleStop.has(t)))];
+ const rt=[...new Set(right.split(' ').filter(t=>t&&!titleStop.has(t)))];
+ if(Math.min(lt.length,rt.length)<3) return false;
+ const rs=new Set(rt); const common=lt.filter(t=>rs.has(t)).length;
+ return common/Math.min(lt.length,rt.length)>=0.8;
+}
+function dedupeRows(rows){
+ const kept=[];
+ for(const row of rows){
+   const idx=kept.findIndex(e=>
+     e.Date===row.Date &&
+     normText(e['Start Time'])===normText(row['Start Time']) &&
+     normText(e.Venue)===normText(row.Venue) &&
+     sameTitle(e.Title,row.Title)
+   );
+   if(idx<0){kept.push(row);continue;}
+   const old=kept[idx];
+   const quality=x=>[(x['Image URL']||'').length>0?1:0,(x.Description||'').length,(x.Title||'').length];
+   const qa=quality(old), qb=quality(row);
+   if(qb[0]>qa[0] || (qb[0]===qa[0] && (qb[1]>qa[1] || (qb[1]===qa[1] && qb[2]>qa[2])))) kept[idx]=row;
+ }
+ return kept;
+}
+const THEMES=['noir','arthouse','retro70','genre','uitbrugge','razorreel'];
+const THEME_COLORS={noir:'#111318',arthouse:'#eee7d6',retro70:'#2a2119',genre:'#050506',uitbrugge:'#ffffff',razorreel:'#ffffff'};
+function applyTheme(theme){
+ const chosen=THEMES.includes(theme)?theme:'noir';
+ document.body.dataset.theme=chosen;
+ const tc=$('themeColor'); if(tc) tc.setAttribute('content',THEME_COLORS[chosen]||'#111318');
+ if($('theme')) $('theme').value=chosen;
+ const title=document.querySelector('.title h1');
+ const subtitle=document.querySelector('.title p');
+ if(chosen==='uitbrugge'){
+   title.textContent='FILMAGENDA';
+   subtitle.textContent='Filmvertoningen, specials, festivals en audiovisuele activiteiten in Brugge.';
+ }else if(chosen==='razorreel'){
+   title.textContent='RAZOR REEL';
+   subtitle.textContent='FLANDERS FILM FEST · BRUGGE FILMAGENDA';
+ }else{
+   title.textContent='Brugge Film Tool';
+   subtitle.textContent='Een cinematische bladerlaag boven UiTinVlaanderen voor Brugge — film, filmfestivals en aanverwante audiovisuele events in de komende 120 dagen.';
+ }
+ localStorage.setItem('bruggeFilmTheme',chosen);
+ renderQuickFilters();
+ render();
+}
+function filtered(){
+ const q=$('search').value.trim().toLowerCase(), cat=$('category').value, venue=$('venue').value, p=$('period').value;
+ const today=new Date(); today.setHours(0,0,0,0); let until=null; if(p!=='all'){until=new Date(today);until.setDate(until.getDate()+Number(p));}
+ let rows=events.filter(e=>{
+  const hay=[e.Title,e.Venue,e.Description,e.Category].join(' ').toLowerCase();
+  const d=new Date(e.Date+'T12:00:00');
+  return (!q||hay.includes(q))&&(!cat||e.Category===cat)&&(!venue||e.Venue===venue)&&(!until||d<=until);
+ });
+ rows=dedupeRows(rows);
+ const sortBy=$('sort')?.value||'date';
+ if(sortBy==='title') rows.sort((a,b)=>(a.Title||'').localeCompare(b.Title||'','nl'));
+ else if(sortBy==='venue') rows.sort((a,b)=>(a.Venue||'').localeCompare(b.Venue||'','nl')||(a.Date||'').localeCompare(b.Date||''));
+ else rows.sort((a,b)=>(a.Date||'').localeCompare(b.Date||'')||(a['Start Time']||'').localeCompare(b['Start Time']||'')||(a.Title||'').localeCompare(b.Title||'','nl'));
+ return rows;
+}
+function render(){
+ const rows=filtered();
+ const categories=[...new Set(events.map(e=>e.Category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+ if($('resultsCount')) $('resultsCount').textContent=`${rows.length} ${rows.length===1?'resultaat':'resultaten'} gevonden`;
+ $('stats').innerHTML='<div class="stat"><strong>'+rows.length+'</strong><span>zichtbaar</span></div>'+
+   categories.map(c=>'<div class="stat"><strong>'+rows.filter(e=>e.Category===c).length+'</strong><span>'+esc(c)+'</span></div>').join('');
+ if(!rows.length){$('list').innerHTML='<div class="empty">Geen resultaten voor deze filters.<small class="note">Probeer een ruimere periode of haal de UiT-data opnieuw op.</small></div>';return;}
+ $('list').innerHTML=rows.map(e=>{
+   const catClass='badge-'+slug(e.Category);
+   const initials=String(e.Title||'FILM').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+   const imageUrl=String(e['Image URL']||'').trim();
+   const imageHtml=imageUrl?`<img class="poster-image" src="${esc(imageUrl)}" alt="${esc('Afbeelding bij ' + (e.Title||'event'))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('has-image');this.remove()">`:``;
+   const shortDate=String(e.Date||'').split('-').slice(1).reverse().join('/');
+   const uitDate=uitDateParts(e.Date);
+   return `<article class="event">
+    <div class="uit-poster ${imageUrl?'has-image':''}">${imageHtml}<span class="poster-badge">${esc(e.Category||'Film')}</span><div class="poster-mark">${esc(initials)}</div><div class="uit-date-banner" aria-label="${esc(fmtUitDate(e.Date))}"><span class="uit-date-weekday">${esc(uitDate.weekday)}</span><span class="uit-date-day">${esc(uitDate.day)}</span><span class="uit-date-month">${esc(uitDate.month)}</span><span class="uit-date-time">${esc(e['Start Time']||'uur onbekend')}</span></div></div>
+    <div class="date-block"><div class="date">${esc(fmtDate(e.Date))}</div><div class="time">${esc(e['Start Time']||'uur onbekend')}</div></div>
+    <div class="content"><div class="name">${esc(e.Title)}</div><div class="meta-row"><span class="badge ${catClass}">${esc(e.Category||'Onbekend')}</span></div></div>
+    <div class="venue-wrap"><div class="venue">${esc(e.Venue||'Locatie onbekend')}</div></div>
+    <div class="desc-wrap"><div class="desc">${esc(e.Description||'Geen beschrijving beschikbaar.')}</div></div>
+    <div class="open-wrap"><a class="open-link" href="${esc(e['UiT Event Link'])}" target="_blank" rel="noopener">Bekijk details</a><span class="date-pill">${esc(shortDate)}</span></div>
+   </article>`;
+ }).join('');
+}
+function renderQuickFilters(){
+ const holder=$('quickFilters');
+ if(!holder) return;
+ const categories=[...new Set(events.map(e=>e.Category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+ const active=$('category')?.value||'';
+ holder.innerHTML=['',...categories].map(c=>`<button type="button" class="filter-chip ${active===c?'active':''}" data-cat="${esc(c)}">${c?esc(c):'Alles'}</button>`).join('');
+ holder.querySelectorAll('.filter-chip').forEach(btn=>btn.addEventListener('click',()=>{
+   $('category').value=btn.dataset.cat||'';
+   renderQuickFilters();
+   render();
+ }));
+}
+function resetFilters(){
+ $('search').value=''; $('category').value=''; $('venue').value=''; $('period').value='all';
+ if($('sort')) $('sort').value='date';
+ renderQuickFilters(); render();
+}
+
+function populateFilters(){
+ const curVenue=$('venue').value, curCategory=$('category').value;
+ const venues=[...new Set(events.map(e=>e.Venue).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+ const categories=[...new Set(events.map(e=>e.Category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+ $('venue').innerHTML='<option value="">Alle locaties</option>'+venues.map(v=>`<option>${esc(v)}</option>`).join('');
+ $('category').innerHTML='<option value="">Alle categorieën</option>'+categories.map(c=>`<option>${esc(c)}</option>`).join('');
+ $('venue').value=curVenue;$('category').value=curCategory;
+ renderQuickFilters();
+}
+async function load(){
+ const r=await fetch('/api/events',{cache:'no-store'});
+ const data=await r.json();
+ events=data.events||[];
+ populateFilters();
+ render();
+ if(data.summary.csv_exists){
+   $('status').textContent=`Laatste update: ${new Date(data.summary.updated_at).toLocaleString('nl-BE')} · ${data.summary.total} events · ${data.summary.image_count||0} beelden`;
+ }else if(data.summary.refreshing){
+   $('status').textContent='De agenda wordt voor de eerste keer opgebouwd…';
+   setTimeout(load,5000);
+ }else{
+   $('status').textContent='Nog geen data beschikbaar. Klik op “UiT verversen”.';
+ }
+}
+async function refresh(){
+ const b=$('refresh');b.disabled=true;b.textContent='Bezig met ophalen…';$('status').textContent='UiTinVlaanderen wordt opnieuw bevraagd…';
+ try{
+   const r=await fetch('/api/refresh',{method:'POST'});
+   const data=await r.json();
+   if(!r.ok||!data.ok)throw new Error(data.error||'Onbekende fout');
+   events=data.events||[];
+   populateFilters();
+   render();
+   if(data.changed){
+     $('status').textContent=`Net ververst · ${data.summary.total} events · ${data.summary.image_count||0} beelden`;
+   }else{
+     $('status').textContent=data.message||'De agenda is al recent genoeg.';
+   }
+ }catch(e){
+   $('status').textContent='Verversen mislukt: '+e.message;
+ }finally{
+   b.disabled=false;b.textContent='UiT verversen';
+ }
+}
+
+function openMobileFilters(){document.body.classList.add('mobile-filters-open');setTimeout(()=>$('search')?.focus(),120)}
+function closeMobileFilters(){document.body.classList.remove('mobile-filters-open');$('search')?.blur()}
+function cycleMobileTheme(){
+ const current=document.body.dataset.theme||'noir';
+ const next=THEMES[(THEMES.indexOf(current)+1)%THEMES.length];
+ applyTheme(next);
+}
+$('mobileFilters').addEventListener('click',openMobileFilters);
+$('closeFilters').addEventListener('click',closeMobileFilters);
+$('mobileTheme').addEventListener('click',cycleMobileTheme);
+$('mobileTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileFilters()});
+document.addEventListener('click',e=>{
+ if(document.body.classList.contains('mobile-filters-open') && !e.target.closest('#filtersPanel') && !e.target.closest('#mobileFilters')) closeMobileFilters();
+});
+
+['search','venue','period'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+$('category').addEventListener('change',()=>{renderQuickFilters();render();});
+$('sort').addEventListener('change',render);
+$('resetFilters').addEventListener('click',()=>{resetFilters();closeMobileFilters();});
+$('refresh').addEventListener('click',refresh);
+$('theme').addEventListener('change',e=>applyTheme(e.target.value));
+applyTheme(localStorage.getItem('bruggeFilmTheme')||'noir');
+load();
+</script>
+</body>
+</html>
