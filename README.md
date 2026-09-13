@@ -157,3 +157,6 @@ Nieuwe optionele skin **Razor Reel**, geïnspireerd op de huidige look & feel va
 
 
 Update in v0.22: Genre Night-skin kreeg een donkere kaiju/monster-achtergrond met leesbare overlay.
+
+
+Cloud hotfix v1.0.1: browserachtige headers toegevoegd aan UiTinVlaanderen GraphQL-verzoeken voor cloudhosting.

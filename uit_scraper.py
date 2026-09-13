@@ -30,6 +30,23 @@ IMAGE_HEADERS = {
     "Accept-Language": "nl-BE,nl;q=0.9,en;q=0.7",
 }
 
+# The UiTinVlaanderen GraphQL route is an internal same-origin web endpoint.
+# Local requests are accepted fairly liberally, while cloud/datacenter traffic
+# may be rejected when it does not resemble the site's normal browser calls.
+# Keep these headers close to what the web app itself sends.
+API_HEADERS = {
+    "User-Agent": IMAGE_HEADERS["User-Agent"],
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "nl-BE,nl;q=0.9,en;q=0.7",
+    "Content-Type": "application/json",
+    "Origin": SITE_BASE_URL,
+    "Referer": f"{SITE_BASE_URL}/agenda",
+    "X-Requested-With": "XMLHttpRequest",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+}
+
 FESTIVAL_EVENT_TYPE_ID = "0.5.0.0.0"
 LECTURE_EVENT_TYPE_ID = "0.3.2.0.0"
 WORKSHOP_EVENT_TYPE_IDS = {"0.3.1.0.1", "0.3.1.0.0"}
@@ -306,9 +323,18 @@ def _fetch_events(today: date, event_type_ids: list[str] | tuple[str, ...]) -> l
                     "dateTo": date_to,
                 },
             },
+            headers=API_HEADERS,
             timeout=config.TIMEOUT,
         )
-        response.raise_for_status()
+        if response.status_code >= 400:
+            # Include a short server response in the cloud error. It makes a
+            # WAF/proxy rejection distinguishable from a normal API error.
+            detail = (response.text or "").strip().replace("\n", " ")[:300]
+            raise requests.HTTPError(
+                f"{response.status_code} {response.reason} for {URL}"
+                + (f" — {detail}" if detail else ""),
+                response=response,
+            )
         body = response.json()
         if body.get("errors") or body.get("data") is None:
             raise RuntimeError(f"UiTinVlaanderen GraphQL API returned errors: {body.get('errors')}")
