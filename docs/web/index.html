@@ -790,6 +790,49 @@ body[data-theme="arthouse"] .status{
   }
 }
 
+
+/* Cinema Noir typography refinement */
+body[data-theme="noir"] .title h1{
+  font-family:"Didot","Bodoni 72","Bodoni MT","Times New Roman",serif;
+  font-size:50px;
+  font-weight:400;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  line-height:.95;
+  white-space:nowrap;
+  text-shadow:0 2px 0 rgba(0,0,0,.72), 0 0 18px rgba(255,255,255,.05);
+}
+
+body[data-theme="noir"] .kicker{
+  font-family:"Didot","Bodoni 72","Bodoni MT","Times New Roman",serif;
+  font-size:11px;
+  font-weight:400;
+  letter-spacing:.30em;
+  text-transform:uppercase;
+}
+
+body[data-theme="noir"] .name{
+  font-family:"Didot","Bodoni 72","Bodoni MT","Times New Roman",serif;
+  font-size:21px;
+  font-weight:500;
+  letter-spacing:.035em;
+  line-height:1.18;
+}
+
+body[data-theme="noir"] .hero-card{
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.035), transparent 38%),
+    linear-gradient(180deg, rgba(12,12,16,.98), rgba(20,20,25,.97));
+}
+
+@media(max-width:900px){
+  body[data-theme="noir"] .title h1{
+    font-size:38px;
+    letter-spacing:.09em;
+    white-space:normal;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -906,6 +949,9 @@ function applyTheme(theme){
  }else if(chosen==='arthouse'){
    title.textContent='BRUGGE FILM AGENDA';
    subtitle.textContent='Een sobere, festivalachtige blik op film en audiovisuele events in Brugge.';
+ }else if(chosen==='noir' || chosen==='retro70' || chosen==='genre'){
+   title.textContent='BRUGGE FILM AGENDA';
+   subtitle.textContent='Een cinematische bladerlaag boven UiTinVlaanderen voor Brugge — film, filmfestivals en aanverwante audiovisuele events in de komende 120 dagen.';
  }else{
    title.textContent='Brugge Film Tool';
    subtitle.textContent='Een cinematische bladerlaag boven UiTinVlaanderen voor Brugge — film, filmfestivals en aanverwante audiovisuele events in de komende 120 dagen.';
