@@ -206,64 +206,77 @@ body[data-theme="arthouse"] .date-block{background:linear-gradient(180deg,rgba(1
 body[data-theme="arthouse"] .date-block::before{background:radial-gradient(circle,#eee7d6 0 3.5px,transparent 3.9px) center 11px/100% 27px repeat-y}
 
 body[data-theme="retro70"]{
-  --bg:#2a2119; --bg-soft:#33281e; --panel:rgba(55,42,30,.97); --panel-2:rgba(67,49,33,.98);
-  --line:rgba(241,193,91,.22); --line-strong:rgba(241,193,91,.36); --ink:#f5dfb3; --muted:#c7a979;
-  --gold:#f1c15b; --gold-soft:rgba(241,193,91,.15); --red:#b74e2f; --red-soft:rgba(183,78,47,.20);
-  --teal:#5d8e7b; --teal-soft:rgba(93,142,123,.18); --shadow:0 18px 55px rgba(0,0,0,.38);
-  background:radial-gradient(circle at 80% 0,rgba(183,78,47,.23),transparent 34%),linear-gradient(180deg,#241b14,#38291c);
+  --bg:#241810; --bg-soft:#2e2017; --panel:rgba(58,37,24,.95); --panel-2:rgba(79,55,37,.97);
+  --line:rgba(255,214,127,.26); --line-strong:rgba(255,214,127,.42); --ink:#fff4d2; --muted:#d8bb8b;
+  --gold:#ffd67f; --gold-soft:rgba(255,214,127,.16); --red:#cf5b39; --red-soft:rgba(207,91,57,.18);
+  --teal:#86b6c2; --teal-soft:rgba(134,182,194,.16); --shadow:0 22px 66px rgba(0,0,0,.42);
+  background:
+    linear-gradient(180deg, rgba(13,9,7,.72), rgba(34,22,15,.86)),
+    radial-gradient(circle at 50% -10%, rgba(255,175,92,.16), transparent 28%),
+    url('./web/retro-marquee.png') center top / cover fixed no-repeat,
+    linear-gradient(180deg,#241810,#3a2619);
 }
-body[data-theme="retro70"] header{background:rgba(38,28,20,.95)}
-body[data-theme="retro70"] .hero-card{border-radius:10px;background:linear-gradient(135deg,rgba(241,193,91,.12),transparent 45%)}
-body[data-theme="retro70"] .event,body[data-theme="retro70"] .stat{border-radius:10px}
-body[data-theme="retro70"] input,body[data-theme="retro70"] select{border-radius:6px;background:#33271d;color:#f5dfb3}
-body[data-theme="retro70"] button,body[data-theme="retro70"] .open-link{border-radius:6px}
+body[data-theme="retro70"] header{
+  background:linear-gradient(180deg, rgba(32,20,13,.94), rgba(42,27,17,.92));
+}
+body[data-theme="retro70"] .hero-card{
+  border-radius:14px;
+  border:2px solid rgba(255,224,145,.38);
+  background:
+    linear-gradient(180deg, rgba(79,52,33,.94), rgba(54,35,24,.95)),
+    linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+  box-shadow:0 0 0 1px rgba(255,224,145,.12), 0 18px 50px rgba(0,0,0,.45);
+}
+body[data-theme="retro70"] .hero-card::before,
+body[data-theme="retro70"] .hero-card::after{
+  background:
+    radial-gradient(circle, rgba(255,228,154,.96) 0 3.4px, rgba(165,96,33,.75) 3.6px 5px, transparent 5.2px) center 11px / 100% 25px repeat-y;
+  opacity:1;
+}
+body[data-theme="retro70"] .title h1{
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  text-shadow:0 2px 0 rgba(0,0,0,.28);
+}
+body[data-theme="retro70"] .title p{color:#f1d5a1}
+body[data-theme="retro70"] .event,
+body[data-theme="retro70"] .stat{
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(73,49,33,.96), rgba(48,33,23,.98));
+}
+body[data-theme="retro70"] .date-block{
+  background:
+    linear-gradient(180deg, rgba(255,213,126,.14), rgba(207,91,57,.12)),
+    linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+}
+body[data-theme="retro70"] .input,
+body[data-theme="retro70"] input,
+body[data-theme="retro70"] select{
+  border-radius:6px;
+  background:#3a291e;
+  color:#fff0c6;
+}
+body[data-theme="retro70"] button,
+body[data-theme="retro70"] .open-link{
+  border-radius:6px;
+}
+body[data-theme="retro70"] .open-link{
+  background:rgba(255,214,127,.12);
+}
+body[data-theme="retro70"] .name{color:#fff1c7}
+body[data-theme="retro70"] .venue,
+body[data-theme="retro70"] .desc{color:#edd8b0}
 
 body[data-theme="genre"]{
-  --bg:#050506; --bg-soft:#0a0a0d; --panel:rgba(8,8,11,.82); --panel-2:rgba(10,10,13,.88);
-  --line:rgba(231,28,36,.24); --line-strong:rgba(231,28,36,.52); --ink:#f5f5f5; --muted:#b0b0b8;
-  --gold:#efefef; --gold-soft:rgba(255,255,255,.08); --red:#e11c24; --red-soft:rgba(225,28,36,.18);
-  --teal:#6f36b6; --teal-soft:rgba(111,54,182,.18); --shadow:0 22px 76px rgba(0,0,0,.58);
-  background:
-    radial-gradient(circle at 84% 10%, rgba(225,28,36,.18), transparent 24%),
-    linear-gradient(180deg, rgba(4,4,6,.18), rgba(4,4,7,.3)),
-    url('/web/genre-night-bg.png') center top / cover no-repeat fixed,
-    linear-gradient(180deg,#030304,#0b0b0e);
+  --bg:#050506; --bg-soft:#0a0a0d; --panel:rgba(12,12,15,.98); --panel-2:rgba(17,17,21,.98);
+  --line:rgba(231,28,36,.22); --line-strong:rgba(231,28,36,.45); --ink:#f5f5f5; --muted:#96969e;
+  --gold:#e7e7e7; --gold-soft:rgba(255,255,255,.08); --red:#e11c24; --red-soft:rgba(225,28,36,.18);
+  --teal:#6f36b6; --teal-soft:rgba(111,54,182,.18); --shadow:0 18px 64px rgba(0,0,0,.7);
+  background:radial-gradient(circle at 85% 0,rgba(225,28,36,.18),transparent 32%),linear-gradient(180deg,#030304,#0b0b0e);
 }
-body[data-theme="genre"]::before{
-  opacity:1;
-  background:
-    linear-gradient(180deg, rgba(3,3,5,.54) 0%, rgba(3,3,5,.76) 40%, rgba(5,5,7,.88) 100%),
-    radial-gradient(circle at 20% 22%, rgba(111,54,182,.10), transparent 24%),
-    radial-gradient(circle at 82% 28%, rgba(225,28,36,.10), transparent 20%);
-  mix-blend-mode:normal;
-}
-body[data-theme="genre"] header{background:linear-gradient(180deg, rgba(7,7,10,.84), rgba(7,7,10,.72)); border-bottom-color:rgba(231,28,36,.22)}
 body[data-theme="genre"] .kicker,body[data-theme="genre"] .stat strong,body[data-theme="genre"] .open-link{color:#ff3b42}
-body[data-theme="genre"] .hero-card{
-  background:linear-gradient(180deg, rgba(10,10,14,.72), rgba(10,10,13,.62));
-  border-color:rgba(225,28,36,.42);
-  box-shadow:0 0 0 1px rgba(225,28,36,.1),0 20px 80px rgba(0,0,0,.48);
-}
-body[data-theme="genre"] .stat,
-body[data-theme="genre"] .event,
-body[data-theme="genre"] .empty{background:linear-gradient(180deg, rgba(8,8,11,.78), rgba(10,10,13,.88))}
-body[data-theme="genre"] .event{backdrop-filter: blur(4px)}
-body[data-theme="genre"] .date-block{
-  background:linear-gradient(180deg, rgba(225,28,36,.24), rgba(225,28,36,.10)), linear-gradient(180deg, rgba(255,255,255,.02), transparent);
-}
-body[data-theme="genre"] .date-block::before{background: radial-gradient(circle, rgba(5,5,6,1) 0 3.5px, transparent 3.9px) center 11px / 100% 27px repeat-y}
-body[data-theme="genre"] .desc{color:#dfdfe5}
-body[data-theme="genre"] .venue{color:#e2e2e6}
+body[data-theme="genre"] .hero-card{border-color:rgba(225,28,36,.42);box-shadow:0 0 0 1px rgba(225,28,36,.1),0 20px 80px rgba(0,0,0,.72)}
 body[data-theme="genre"] button.primary{background:linear-gradient(180deg,#ef2730,#9f0e14);border-color:#ff5258}
-body[data-theme="genre"] .open-link{background:rgba(225,28,36,.10);border-color:rgba(225,28,36,.32)}
-body[data-theme="genre"] .open-link:hover{background:rgba(225,28,36,.16)}
-@media(max-width:850px){
-  body[data-theme="genre"]{background:
-    linear-gradient(180deg, rgba(4,4,6,.20), rgba(4,4,7,.34)),
-    url('/web/genre-night-bg.png') center top / cover no-repeat,
-    linear-gradient(180deg,#030304,#0b0b0e);
-  }
-}
 
 
 /* UiT in Brugge — closer to the public UiTkalender: clean white canvas, editorial cards. */
@@ -636,6 +649,7 @@ body[data-theme="razorreel"] .empty{background:#fff;border:3px solid #111;border
   .actions{padding:0 8px;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
   .actions .theme-select{min-width:0;width:100%;height:44px}
   .actions #refresh{height:44px;padding:0 13px;white-space:nowrap}
+  .actions #refresh{display:none !important}
   button,input,select,.open-link{min-height:44px}
 
   .controls{
@@ -867,7 +881,7 @@ function render(){
  if($('resultsCount')) $('resultsCount').textContent=`${rows.length} ${rows.length===1?'resultaat':'resultaten'} gevonden`;
  $('stats').innerHTML='<div class="stat"><strong>'+rows.length+'</strong><span>zichtbaar</span></div>'+
    categories.map(c=>'<div class="stat"><strong>'+rows.filter(e=>e.Category===c).length+'</strong><span>'+esc(c)+'</span></div>').join('');
- if(!rows.length){$('list').innerHTML='<div class="empty">Geen resultaten voor deze filters.<small class="note">Probeer een ruimere periode of haal de UiT-data opnieuw op.</small></div>';return;}
+ if(!rows.length){$('list').innerHTML='<div class="empty">Geen resultaten voor deze filters.<small class="note">Probeer een ruimere periode of pas je filters aan.</small></div>';return;}
  $('list').innerHTML=rows.map(e=>{
    const catClass='badge-'+slug(e.Category);
    const initials=String(e.Title||'FILM').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
@@ -918,14 +932,7 @@ async function load(){
  events=data.events||[];
  populateFilters();
  render();
- if(data.summary.csv_exists){
-   $('status').textContent=`Laatste update: ${new Date(data.summary.updated_at).toLocaleString('nl-BE')} · ${data.summary.total} events · ${data.summary.image_count||0} beelden`;
- }else if(data.summary.refreshing){
-   $('status').textContent='De agenda wordt voor de eerste keer opgebouwd…';
-   setTimeout(load,5000);
- }else{
-   $('status').textContent='Nog geen data beschikbaar. Klik op “UiT verversen”.';
- }
+ $('status').textContent=data.summary.csv_exists?`Laatste CSV-update: ${new Date(data.summary.updated_at).toLocaleString('nl-BE')} · ${data.summary.total} events in bestand · ${data.summary.image_count||0} beelden`:'Nog geen gegevensbestand gevonden. De agenda wordt lokaal of automatisch bijgewerkt.';
 }
 async function refresh(){
  const b=$('refresh');b.disabled=true;b.textContent='Bezig met ophalen…';$('status').textContent='UiTinVlaanderen wordt opnieuw bevraagd…';
@@ -936,11 +943,7 @@ async function refresh(){
    events=data.events||[];
    populateFilters();
    render();
-   if(data.changed){
-     $('status').textContent=`Net ververst · ${data.summary.total} events · ${data.summary.image_count||0} beelden`;
-   }else{
-     $('status').textContent=data.message||'De agenda is al recent genoeg.';
-   }
+   $('status').textContent=`Net ververst · ${data.summary.total} events gevonden · ${data.summary.image_count||0} beelden`;
  }catch(e){
    $('status').textContent='Verversen mislukt: '+e.message;
  }finally{
@@ -968,7 +971,7 @@ document.addEventListener('click',e=>{
 $('category').addEventListener('change',()=>{renderQuickFilters();render();});
 $('sort').addEventListener('change',render);
 $('resetFilters').addEventListener('click',()=>{resetFilters();closeMobileFilters();});
-$('refresh').addEventListener('click',refresh);
+if($('refresh')) $('refresh').addEventListener('click',refresh);
 $('theme').addEventListener('change',e=>applyTheme(e.target.value));
 applyTheme(localStorage.getItem('bruggeFilmTheme')||'noir');
 load();
