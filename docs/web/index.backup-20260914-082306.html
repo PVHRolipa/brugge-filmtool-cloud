@@ -1,114 +1,14 @@
 <!doctype html>
 <html lang="nl">
 <head>
-
-<style id="github-pages-public-fixes">
-  /* De publieke GitHub Pages-site kan zelf niet scrapen. */
-  .public-refresh-hidden { display: none !important; }
-</style>
-
-<script id="github-pages-static-adapter">
-(() => {
-  const originalFetch = window.fetch.bind(window);
-
-  function jsonResponse(payload, status = 200) {
-    return Promise.resolve(new Response(JSON.stringify(payload), {
-      status,
-      headers: {"Content-Type": "application/json; charset=utf-8"}
-    }));
-  }
-
-  function isRefreshControl(el) {
-    if (!el) return false;
-    const candidate = el.closest ? el.closest("button, a, [role='button']") : null;
-    if (!candidate) return false;
-
-    const text = (candidate.textContent || "").trim().toLowerCase();
-    const title = (candidate.getAttribute("title") || "").toLowerCase();
-    const aria = (candidate.getAttribute("aria-label") || "").toLowerCase();
-    const idClass = ((candidate.id || "") + " " + (candidate.className || "")).toLowerCase();
-
-    return (
-      text.includes("ververs") ||
-      text === "refresh" ||
-      title.includes("ververs") ||
-      aria.includes("ververs") ||
-      idClass.includes("refresh")
-    );
-  }
-
-  function hideRefreshControls(root = document) {
-    const candidates = root.querySelectorAll
-      ? root.querySelectorAll("button, a, [role='button']")
-      : [];
-    for (const el of candidates) {
-      if (isRefreshControl(el)) {
-        el.classList.add("public-refresh-hidden");
-        el.setAttribute("aria-hidden", "true");
-        el.setAttribute("tabindex", "-1");
-      }
-    }
-  }
-
-  window.fetch = function(input, init) {
-    const raw = typeof input === "string" ? input : (input && input.url) || "";
-    let path = raw;
-    try {
-      path = new URL(raw, window.location.href).pathname;
-    } catch (_) {}
-
-    if (path.endsWith("/api/events")) {
-      return originalFetch("./data/events.json?v=" + Date.now(), {
-        cache: "no-store"
-      });
-    }
-
-    if (path.endsWith("/api/health")) {
-      return jsonResponse({ok: true, mode: "github-pages", static: true});
-    }
-
-    if (path.endsWith("/api/refresh")) {
-      /* Nooit een publieke scrape proberen. Behandel dit als een geslaagde no-op. */
-      return jsonResponse({
-        ok: true,
-        static: true,
-        skipped: true,
-        message: "De publieke agenda wordt dagelijks automatisch bijgewerkt."
-      }, 200);
-    }
-
-    return originalFetch(input, init);
-  };
-
-  /* Blokkeer een refresh-click ook als de knop later door JavaScript wordt opgebouwd. */
-  document.addEventListener("click", (event) => {
-    if (isRefreshControl(event.target)) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      return false;
-    }
-  }, true);
-
-  document.addEventListener("DOMContentLoaded", () => {
-    hideRefreshControls();
-
-    const observer = new MutationObserver(() => hideRefreshControls());
-    observer.observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    });
-  });
-})();
-</script>
-
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta id="themeColor" name="theme-color" content="#111318">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Brugge Film">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <title>Brugge Film Tool</title>
 <style>
 :root {
@@ -848,48 +748,6 @@ body[data-theme="genre"]{
     linear-gradient(180deg,#030304,#0b0b0e) !important;
 }
 
-
-/* Arthouse typography refinement */
-body[data-theme="arthouse"] .title h1{
-  font-family:"Arial Narrow","Helvetica Neue Condensed","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif;
-  font-size:54px;
-  font-weight:500;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  line-height:.95;
-  white-space:nowrap;
-}
-
-body[data-theme="arthouse"] .kicker{
-  font-family:"Arial Narrow","Helvetica Neue Condensed","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif;
-  letter-spacing:.28em;
-  text-transform:uppercase;
-  font-size:11px;
-  font-weight:500;
-}
-
-body[data-theme="arthouse"] .name{
-  font-family:"Arial Narrow","Helvetica Neue Condensed","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif;
-  font-size:22px;
-  font-weight:600;
-  letter-spacing:.045em;
-  line-height:1.15;
-}
-
-body[data-theme="arthouse"] .venue,
-body[data-theme="arthouse"] .desc,
-body[data-theme="arthouse"] .status{
-  letter-spacing:.015em;
-}
-
-@media(max-width:900px){
-  body[data-theme="arthouse"] .title h1{
-    font-size:40px;
-    letter-spacing:.10em;
-    white-space:normal;
-  }
-}
-
 </style>
 </head>
 <body>
@@ -1003,9 +861,6 @@ function applyTheme(theme){
  }else if(chosen==='razorreel'){
    title.textContent='RAZOR REEL';
    subtitle.textContent='FLANDERS FILM FEST · BRUGGE FILMAGENDA';
- }else if(chosen==='arthouse'){
-   title.textContent='BRUGGE FILM AGENDA';
-   subtitle.textContent='Een sobere, festivalachtige blik op film en audiovisuele events in Brugge.';
  }else{
    title.textContent='Brugge Film Tool';
    subtitle.textContent='Een cinematische bladerlaag boven UiTinVlaanderen voor Brugge — film, filmfestivals en aanverwante audiovisuele events in de komende 120 dagen.';

@@ -748,6 +748,48 @@ body[data-theme="genre"]{
     linear-gradient(180deg,#030304,#0b0b0e) !important;
 }
 
+
+/* Arthouse typography refinement */
+body[data-theme="arthouse"] .title h1{
+  font-family:"Arial Narrow","Helvetica Neue Condensed","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif;
+  font-size:54px;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  line-height:.95;
+  white-space:nowrap;
+}
+
+body[data-theme="arthouse"] .kicker{
+  font-family:"Arial Narrow","Helvetica Neue Condensed","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  font-size:11px;
+  font-weight:500;
+}
+
+body[data-theme="arthouse"] .name{
+  font-family:"Arial Narrow","Helvetica Neue Condensed","Avenir Next Condensed","Helvetica Neue",Arial,sans-serif;
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:.045em;
+  line-height:1.15;
+}
+
+body[data-theme="arthouse"] .venue,
+body[data-theme="arthouse"] .desc,
+body[data-theme="arthouse"] .status{
+  letter-spacing:.015em;
+}
+
+@media(max-width:900px){
+  body[data-theme="arthouse"] .title h1{
+    font-size:40px;
+    letter-spacing:.10em;
+    white-space:normal;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -861,6 +903,9 @@ function applyTheme(theme){
  }else if(chosen==='razorreel'){
    title.textContent='RAZOR REEL';
    subtitle.textContent='FLANDERS FILM FEST · BRUGGE FILMAGENDA';
+ }else if(chosen==='arthouse'){
+   title.textContent='BRUGGE FILM AGENDA';
+   subtitle.textContent='Een sobere, festivalachtige blik op film en audiovisuele events in Brugge.';
  }else{
    title.textContent='Brugge Film Tool';
    subtitle.textContent='Een cinematische bladerlaag boven UiTinVlaanderen voor Brugge — film, filmfestivals en aanverwante audiovisuele events in de komende 120 dagen.';
