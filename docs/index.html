@@ -838,6 +838,16 @@ body[data-theme="razorreel"] .empty{background:#fff;border:3px solid #111;border
 }
 @media(min-width:721px){body.mobile-filters-open::after{display:none}}
 
+
+/* Genre Night background safeguard */
+body[data-theme="genre"]{
+  background:
+    linear-gradient(180deg, rgba(3,3,4,.74), rgba(8,8,10,.90)),
+    radial-gradient(circle at 82% 0, rgba(225,28,36,.18), transparent 32%),
+    url("./web/genre-night-bg.png") center top / cover fixed no-repeat,
+    linear-gradient(180deg,#030304,#0b0b0e) !important;
+}
+
 </style>
 </head>
 <body>
@@ -858,7 +868,6 @@ body[data-theme="razorreel"] .empty{background:#fff;border:3px solid #111;border
           <option value="uitbrugge">UiT in Brugge</option>
           <option value="razorreel">Razor Reel</option>
         </select>
-        <button id="refresh" class="primary">UiT verversen</button>
       </div>
     </div>
   </div>
@@ -1071,7 +1080,7 @@ document.addEventListener('click',e=>{
 $('category').addEventListener('change',()=>{renderQuickFilters();render();});
 $('sort').addEventListener('change',render);
 $('resetFilters').addEventListener('click',()=>{resetFilters();closeMobileFilters();});
-if($('refresh')) $('refresh').addEventListener('click',refresh);
+
 $('theme').addEventListener('change',e=>applyTheme(e.target.value));
 applyTheme(localStorage.getItem('bruggeFilmTheme')||'noir');
 load();
